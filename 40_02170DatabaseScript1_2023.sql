@@ -48,7 +48,7 @@ create table Airports
 create table Place
 	(PlacesID varchar(4),
     Terminal char(1),
-    Service varchar(4),
+    Service varchar(7),
     foreign key(Terminal) references Terminal(TerminalID),
     primary key (PlacesID)
     );
@@ -56,7 +56,7 @@ create table Place
 # Activity
 create table Activity
 	(ActivityID varchar(4),
-    Service varchar(4),
+    Service varchar(7),
     ActivityDescription varchar(40),
     Place varchar(4) not null,
     Person char(9) not null,
