@@ -72,7 +72,8 @@ create table Flights
     ArrivalTime time,
     Aircraft varchar(20),
     Airline varchar(20),
-    Capacity decimal(3,0),
+    PassengerCapacity decimal(3,0),
+    LuggageCapacity decimal(3,0),
     SourceCode char(3),
     DestinationCode char(3),
     primary key(FlightID, LocalDate),
@@ -81,16 +82,16 @@ create table Flights
 
 # Gate
 create table Gate(
-	GateId varchar(3) not null,
+	GateID varchar(3) not null,
 	FlightID varchar(10) not null,
 	AllocationStart Time,
 	AllocationEnd Time,
 	FloorLevel decimal(1,0),
     Terminal char(1) not null,
-	constraint id_format check (GateId like '[A-Z][0-9][0-9]'),
+	constraint id_format check (GateID like '[A-Z][0-9][0-9]'),
 	foreign key(Terminal) references Terminal(TerminalID),
     foreign key(FlightID) references Flights(FlightID),
-    primary key(GateId, Terminal)
+    primary key(GateID, Terminal)
 	);
 
 create table Ticket
