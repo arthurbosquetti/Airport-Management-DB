@@ -27,7 +27,7 @@ create table Terminal(
     );
 
 # Airports schema
-create table Airports
+create table Airport
 	(AirportCode char(3),
     constraint code_format check (AirportCode regexp '^[A-Z]\{3,3\}$'),
     AirportName varchar(50),
@@ -51,9 +51,9 @@ create table Passenger
 # Place schema
 create table Place
 	(PlaceID varchar(4) not null,
-    Terminal char(1) not null,
+    TerminalID char(1) not null,
     Service varchar(10),
-    foreign key(Terminal) references Terminal(TerminalID),
+    foreign key(TerminalID) references Terminal(TerminalID),
     primary key (PlaceID)
     );
 
@@ -70,7 +70,7 @@ create table Activity
 	);
 
 # Flight schema
-create table Flights
+create table Flight
 	(FlightID char(7) not null,
     constraint id_format check (FlightID regexp '^[A-Z]\{3,3\}[0-9]\{4,4\}$'),
     DepartureTime datetime,
@@ -82,8 +82,8 @@ create table Flights
     SourceCode char(3),
     DestinationCode char(3),
     primary key(FlightID),
-    foreign key(SourceCode) references Airports(AirportCode),
-    foreign key(DestinationCode) references Airports(AirportCode)
+    foreign key(SourceCode) references Airport(AirportCode),
+    foreign key(DestinationCode) references Airport(AirportCode)
     );
     
 
@@ -97,7 +97,7 @@ create table Gate(
     Terminal char(1) not null,
 	constraint id_format check (GateID regexp '^[A-Z][0-9][0-9]$'),
 	foreign key(Terminal) references Terminal(TerminalID),
-    foreign key(FlightID) references Flights(FlightID),
+    foreign key(FlightID) references Flight(FlightID),
     primary key(GateID, Terminal)
 	);
 
@@ -109,7 +109,7 @@ create table Ticket
     FlightID char(10) not null,
     TimeSlot date,
     foreign key(PassportID) references Passenger(PassportID),
-    foreign key(FlightID) references Flights(FlightID),
+    foreign key(FlightID) references Flight(FlightID),
     primary key(TicketID)
     );
 
@@ -132,8 +132,8 @@ SHOW ENGINE INNODB STATUS;
 # ____________________DATABASE POPULATION_____________________
 insert into Terminal(TerminalID) values ('1'), ('2'), ('3'), ('4'), ('5');
 
-# Airports inserts
-insert into Airports values
+# Airport inserts
+insert into Airport values
 	('CPH', 'Copenhagen International Airport', 'Denmark', 'Copenhagen'),
     ('FLN', 'Aeroporto International de Florianopolis', 'Brazil', 'Florianopolis'),
     ('AMS', 'Amsterdam Airport Schipol', 'Netherlands', 'Amsterdam'),
@@ -164,7 +164,7 @@ insert Passenger values
     ('000000009','Yasmin','Fosquetti','slayfosquetti@gmail.com','33890923'),
     ('000000010','Carina','Nijolek','carinanijo@hotmail.com','29461073'),
     ('000000011','Paul','McCartney','pmccartney@hotmail.com','38399922'),
-    ('000000012','Snoop','Dog','snoopydoggy@private.com','77832430'),
+    ('000000012','Snoop','Dogg','snoopydoggy@private.com','77832430'),
     ('000000013','Jonas','Knocksen','pmccartney@hotmail.com','83901322'),
     ('000000014','Marilyn','Monroe','marimonroe1@gmail.com','33997283'),
     ('000000015','Neil','Armstrong','nielastro1@yahoo.com','66249129'),
@@ -176,7 +176,7 @@ insert Passenger values
 
 # Place inserts
 insert into Place values 
-    # PlacesID, Terminal, Service
+    # PlacesID, TerminalID, Service
     ('P001', '1', 'Duty-Free'), ('P002', '1', 'Check-In'),
     ('P003', '1', 'Check-Out'), ('P004', '1', 'Food'),
     ('P005', '1', 'Clothes'), ('P006', '2', 'Duty-Free'),
@@ -192,7 +192,7 @@ insert into Place values
 
 
 insert into Activity values 
-    # ActivityID, Service, ActivityDescription, Place, Person
+    # ActivityID, Service, ActivityDescription, PlaceID, PassportID
     ('A001', 'Check-In', 'Checked in for flight', 'P002', '000000001'),
 	('A002', 'Food', 'Bought a burger', 'P004', '000000002'),
     ('A003', 'Clothes', 'Bought a shirt', 'P005', '000000003'),
@@ -210,7 +210,7 @@ insert into Activity values
     ('A015', 'Food', 'Ordered a pizza', 'P004', '000000015');
 
 # Flights inserts
-insert into Flights values
+insert into Flight values
     # FlightID, DepTime, ArrTime, Aircraft, Airline, PassengerCapacity, LuggageCapacity, SourceCode, DestinationCode
     ("LAT2359", "2023-04-22 10:50:00.00",  "2023-04-23 19:30:00.00", "Boeing 737", "Latam", 100, 1500, "FLN", "CPH"),
     ("LAT6893", "2023-04-22 19:30:00.00",  "2023-04-23 10:34:00.00", "Boeing 767", "Latam", 100, 1500, "AMS", "CPH"),
@@ -233,7 +233,7 @@ insert into Flights values
 
 # Gate inserts
 insert into Gate values
-    # GateID, FlightID, AllocationStart, AllocationEnd, FloorLevel, Terminal
+    # GateID, FlightID, AllocationStart, AllocationEnd, FloorLevel, TerminalID
     ( 'A10', null, null, null, 0, '1' ),
     ( 'A11', null, null, null, 0, '1'),
     ( 'A33', null, null, null, 1, '1'),
@@ -244,7 +244,7 @@ insert into Gate values
 
 # Ticket inserts
 insert into Ticket values 
-    # TicketID, Class, PassengerID, FlightID, TimeSlot
+    # TicketID, Class, PassengerID, FlightID, ValidDate
 	('223EU89441637','Member','000000001','LAT2359', '2023-04-22'),
 	('AUT5541903212','Gold','000000002','LAT6893', '2023-04-22'),
 	('420OL1722640K','Economy','000000003','MAX1234', '2023-04-22'),
@@ -264,7 +264,7 @@ insert into Ticket values
 
 # Luggage inserts
 insert into Luggage values
-    # LuggageID, Weight, Delivered, OwnerID, Ticket
+    # LuggageID, Weight, Delivered, PassportID, TicketID
     ('19287364','12.30',false,'000000001','223EU89441637'),
 	('19287365','18.40',false,'000000001','223EU89441637'),
     ('19287366','7.20',false, '000000001','223EU89441637'),
@@ -288,3 +288,11 @@ insert into Luggage values
 
 
 select * from Passenger;
+select * from Flight;
+select * from Ticket;
+select * from Airport;
+select * from Luggage;
+select * from Place;
+select * from Activity;
+select * from Terminal;
+select * from Luggage;
