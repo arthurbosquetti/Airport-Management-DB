@@ -9,9 +9,9 @@ create user 'cphstaff'@'localhost' identified by 'hygge4ever';
 -- revoke select, index, update, delete on AirportManagement.Flights from 'cphstaff'@'localhost';
 
 # Get all GRANT commands, copy (unquoted) and paste on the script.
-select concat("grant all on airportmanagement.", table_name, " to 'cphstaff'@'localhost';") 
-	from information_schema.TABLES where table_schema = "airportmanagement";
-
+-- select concat("grant all on airportmanagement.", table_name, " to 'cphstaff'@'localhost';") 
+-- 	from information_schema.TABLES where table_schema = "airportmanagement";
+# Paste the GRANT commands here:
 grant all on airportmanagement.Passenger to 'cphstaff'@'localhost';
 grant all on airportmanagement.Activity to 'cphstaff'@'localhost';
 grant all on airportmanagement.Airport to 'cphstaff'@'localhost';

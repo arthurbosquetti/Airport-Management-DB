@@ -53,7 +53,7 @@ create table Place
 	(PlaceID varchar(4) not null,
     TerminalID char(1) not null,
     Service varchar(10),
-    foreign key(TerminalID) references Terminal(TerminalID),
+    foreign key(TerminalID) references Terminal(TerminalID) on delete cascade,
     primary key (PlaceID)
     );
 
@@ -64,8 +64,8 @@ create table Activity
     ActivityDescription varchar(40),
     PlaceID varchar(4) not null,
     PassportID char(9) not null,
-    foreign key(PlaceID) references Place(PlaceID),
-    foreign key(PassportID) references Passenger(PassportID),
+    foreign key(PlaceID) references Place(PlaceID) on delete cascade,
+    foreign key(PassportID) references Passenger(PassportID) on delete cascade,
     primary key(ActivityID)
 	);
 
@@ -82,22 +82,22 @@ create table Flight
     SourceCode char(3),
     DestinationCode char(3),
     primary key(FlightID),
-    foreign key(SourceCode) references Airport(AirportCode),
-    foreign key(DestinationCode) references Airport(AirportCode)
+    foreign key(SourceCode) references Airport(AirportCode) on delete set null,
+    foreign key(DestinationCode) references Airport(AirportCode) on delete set null
     );
     
 
 # Gate schema
 create table Gate(
 	GateID varchar(3) not null,
-	FlightID char(10),
+	FlightID char(7),
 	AllocationStart Time,
 	AllocationEnd Time,
 	FloorLevel decimal(1,0),
     Terminal char(1) not null,
 	constraint id_format check (GateID regexp '^[A-Z][0-9][0-9]$'),
-	foreign key(Terminal) references Terminal(TerminalID),
-    foreign key(FlightID) references Flight(FlightID),
+	foreign key(Terminal) references Terminal(TerminalID) on delete cascade,
+    foreign key(FlightID) references Flight(FlightID) on delete set null,
     primary key(GateID, Terminal)
 	);
 
@@ -106,10 +106,10 @@ create table Ticket
 	(TicketID char(13) not null,
     Class ENUM('First class','Gold', 'Member', 'Economy'),
     PassportID char(9) not null,
-    FlightID char(10) not null,
+    FlightID char(10),
     TimeSlot date,
-    foreign key(PassportID) references Passenger(PassportID),
-    foreign key(FlightID) references Flight(FlightID),
+    foreign key(PassportID) references Passenger(PassportID) on delete cascade,
+    foreign key(FlightID) references Flight(FlightID) on delete set null,
     primary key(TicketID)
     );
 
@@ -234,12 +234,12 @@ insert into Flight values
 # Gate inserts
 insert into Gate values
     # GateID, FlightID, AllocationStart, AllocationEnd, FloorLevel, TerminalID
-    ( 'A10', null, null, null, 0, '1' ),
-    ( 'A11', null, null, null, 0, '1'),
-    ( 'A33', null, null, null, 1, '1'),
-    ( 'B01', null, null, null, 0, '2'),
-    ( 'B02', null, null, null, 1, '2'),
-    ( 'C33', null, null, null, 0, '5');
+    ( 'A10', "LAT2359", null, null, 0, '1' ),
+    ( 'A11', "MAX1234", null, null, 0, '1'),
+    ( 'A33', "SAS9921", null, null, 1, '1'),
+    ( 'B01', "RYN5032", null, null, 0, '2'),
+    ( 'B02', "MAL6666", null, null, 1, '2'),
+    ( 'C33', "BAL5326", null, null, 0, '5');
 
 
 # Ticket inserts
