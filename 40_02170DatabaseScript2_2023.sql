@@ -125,6 +125,26 @@ call AllocateGate('POT5311', '1');
 call AllocateGate('LOT2137', '2');
 select * from Gate;
 
+# -- Trigger regarding arrival/departure time and destination on the flight:
+delimiter //
+create trigger CheckTimeAirport
+before insert on Flight for each row
+begin 
+	if new.ArrivalTime <= new.DepartureTime 
+	then signal sqlstate 'HY000'
+		set mysql_errno = 1580,
+        message_text = 'Arrival time should follow departure time';
+end if;
+if new.SourceCode = new.DestinationCode
+	then signal sqlstate 'HY000'
+		set mysql_errno = 1590,
+			message_text = 'A flight cannot have the same source and destination airport';
+end if;
+end //
+delimiter ;
+
+# -- Event for gate allocation approaching time:
+
 # |-------------------->Table Modifications (update/delete statements)<------------|
 
 set sql_safe_updates = 0;
