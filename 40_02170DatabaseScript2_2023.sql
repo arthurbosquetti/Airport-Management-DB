@@ -118,12 +118,6 @@ where Place.TerminalID = '3';
 select * from Activity;
 
 
--- Cancel all flights from Malokair for that day
-delete from Flight where airline='malokair';
-
-select * from Flight;
-
-
 -- Upgrading all passengers by  one class
 update Ticket set Class = 
 	case
@@ -133,6 +127,12 @@ update Ticket set Class =
     when class = 'Economy' then 'Member'
     end;
 select * from ticket;
+
+
+-- Cancel all flights from Malokair for that day
+delete from Flight where airline='malokair';
+
+select * from Flight;
 
 
 -- Mark all luggage from Passenger '000000001' as delivered
