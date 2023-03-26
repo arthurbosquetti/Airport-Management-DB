@@ -117,7 +117,18 @@ select t.FlightID, t.PassportID, t.Class, count(l.LuggageID) as 'Amount of lugga
 from Ticket t left join Luggage l on l.PassportID = t.PassportID
 where FlightID = 'GOL5021' group by t.TicketID;
 
--- Deleting or updating places in the airport along with their descriptions
+-- Deleting activities in terminal 3
+select Activity.*, Place.TerminalID from Activity
+join Place on Activity.PlaceID = Place.PlaceID
+order by TerminalID asc;
+
+delete a from Activity a
+join Place on a.PlaceID = Place.PlaceID
+where Place.TerminalID = '3';
+
+select Activity.*, Place.TerminalID from Activity
+join Place on Activity.PlaceID = Place.PlaceID
+order by TerminalID asc;
 
 -- Deleting or updating the terminal numbers
 
