@@ -87,54 +87,48 @@ select FirstName, LastName, Email, LuggageID
 	from Passenger natural join Luggage natural join Flight natural join Ticket
     where Delivered = false and DepartureTime < current_time();
     
+---------------------------------------------------------
 -- Updates and deletes (section 8 on table modifications)
+---------------------------------------------------------
+
+set sql_safe_updates = 0;
 
 -- Updating flights to Honk-Kong and Florianopolis, to redirect them through Copenhagen airport, unless they flew from Copenhagen
-select * from Flight;
-
 update Flight
-set DestinationCode =
-	case 
-		when DestinationCode = 'HKG' and SourceCode != 'CPH' then 'CPH'
-		when DestinationCode = 'FLN' and SourceCode != 'CPH' then 'CPH'
-		else DestinationCode
-    end
-where DestinationCode in ('HKG', 'FLN');
+set DestinationCode = 'CPH'
+where SourceCode != 'CPH' and DestinationCode in ('HKG', 'FLN');
 
 select * from Flight;
+
 
 -- Upgrading economy-class passengers of flight GOL5021, which don't have a luggage to first class by updating the table
-select t.FlightID, t.PassportID, t.Class, count(l.LuggageID) as 'Amount of luggage'
-from Ticket t left join Luggage l on l.PassportID = t.PassportID
-where FlightID = 'GOL5021' group by t.TicketID;
-
 update Ticket left join Luggage
 on Luggage.PassportID = Ticket.PassportID
 set Class = 'First class'
 where Luggage.PassportID is null and Ticket.FlightID = 'GOL5021' and Ticket.Class = 'Economy';
 
-select t.FlightID, t.PassportID, t.Class, count(l.LuggageID) as 'Amount of luggage'
-from Ticket t left join Luggage l on l.PassportID = t.PassportID
-where FlightID = 'GOL5021' group by t.TicketID;
+select * from Ticket;
 
--- Deleting activities in terminal 3
-select Activity.*, Place.TerminalID from Activity
-join Place on Activity.PlaceID = Place.PlaceID
-order by TerminalID asc;
 
+-- Deleting all activities in terminal 3
 delete a from Activity a
 join Place on a.PlaceID = Place.PlaceID
 where Place.TerminalID = '3';
 
-select Activity.*, Place.TerminalID from Activity
-join Place on Activity.PlaceID = Place.PlaceID
-order by TerminalID asc;
+select * from Activity;
 
--- Deleting or updating the terminal numbers
 
--- Deleting (loosing) the luggage for a certain flight or "miss placing it"
+-- Cancel all flights from Malokair for that day
+delete from flight where airline='malokair';
 
--- Updating the terminal/gate for flights
-    
+select * from flight where airline='malokair';
+
+
+-- Mark all luggage from Passenger '000000001' as delivered
+update luggage set delivered=true where PassportID = '000000001';
+
+select * from luggage;
+
+
 # |-------------------------------->SQL Programming<-------------------------------|
 
