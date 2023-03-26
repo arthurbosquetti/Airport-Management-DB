@@ -87,5 +87,43 @@ select FirstName, LastName, Email, LuggageID
 	from Passenger natural join Luggage natural join Flight natural join Ticket
     where Delivered = false and DepartureTime < current_time();
     
+-- Updates and deletes (section 8 on table modifications)
+
+-- Updating flights to Honk-Kong and Florianopolis, to redirect them through Copenhagen airport, unless they flew from Copenhagen
+select * from Flight;
+
+update Flight
+set DestinationCode =
+	case 
+		when DestinationCode = 'HKG' and SourceCode != 'CPH' then 'CPH'
+		when DestinationCode = 'FLN' and SourceCode != 'CPH' then 'CPH'
+		else DestinationCode
+    end
+where DestinationCode in ('HKG', 'FLN');
+
+select * from Flight;
+
+-- Upgrading economy-class passengers of flight GOL5021, which don't have a luggage to first class by updating the table
+select t.FlightID, t.PassportID, t.Class, count(l.LuggageID) as 'Amount of luggage'
+from Ticket t left join Luggage l on l.PassportID = t.PassportID
+where FlightID = 'GOL5021' group by t.TicketID;
+
+update Ticket left join Luggage
+on Luggage.PassportID = Ticket.PassportID
+set Class = 'First class'
+where Luggage.PassportID is null and Ticket.FlightID = 'GOL5021' and Ticket.Class = 'Economy';
+
+select t.FlightID, t.PassportID, t.Class, count(l.LuggageID) as 'Amount of luggage'
+from Ticket t left join Luggage l on l.PassportID = t.PassportID
+where FlightID = 'GOL5021' group by t.TicketID;
+
+-- Deleting or updating places in the airport along with their descriptions
+
+-- Deleting or updating the terminal numbers
+
+-- Deleting (loosing) the luggage for a certain flight or "miss placing it"
+
+-- Updating the terminal/gate for flights
+    
 # |-------------------------------->SQL Programming<-------------------------------|
 
