@@ -29,7 +29,7 @@ show grants for 'cphstaff'@'localhost';
 
 
 -- Create virtual table (view) for flights related to CPH airport
-drop table if exists CPHFlight;
+drop view if exists CPHFlight;
 create view CPHFlight as
     select * from Flight 
     where SourceCode = 'CPH' or DestinationCode = 'CPH';
