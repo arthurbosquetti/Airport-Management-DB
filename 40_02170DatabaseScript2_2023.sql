@@ -2,12 +2,34 @@
 -- Create user that can access the database and corresponding view
 drop user if exists 'cphstaff'@'localhost';
 create user 'cphstaff'@'localhost' identified by 'hygge4ever';
-grant all on AirportManagement.* to 'cphstaff'@'localhost';
+
+-- grant all on AirportManagement.* to 'cphstaff'@'localhost';
+-- show grants for 'cphstaff'@'localhost';
+-- revoke select, index on AirportManagement.Airports from 'cphstaff'@'localhost';
+-- revoke select, index, update, delete on AirportManagement.Flights from 'cphstaff'@'localhost';
+
+# Get all GRANT commands, copy (unquoted) and paste on the script.
+select concat("grant all on airportmanagement.", table_name, " to 'cphstaff'@'localhost';") 
+	from information_schema.TABLES where table_schema = "airportmanagement";
+
+grant all on airportmanagement.Passenger to 'cphstaff'@'localhost';
+grant all on airportmanagement.Activity to 'cphstaff'@'localhost';
+grant all on airportmanagement.Airport to 'cphstaff'@'localhost';
+grant all on airportmanagement.Flight to 'cphstaff'@'localhost';
+grant all on airportmanagement.Luggage to 'cphstaff'@'localhost';
+grant all on airportmanagement.Ticket to 'cphstaff'@'localhost';
+grant all on airportmanagement.Terminal to 'cphstaff'@'localhost';
+grant all on airportmanagement.Gate to 'cphstaff'@'localhost';
+grant all on airportmanagement.Place to 'cphstaff'@'localhost';
+
+revoke select, index on AirportManagement.Airport from 'cphstaff'@'localhost';
+revoke select, index, update, delete, insert on AirportManagement.Flight from 'cphstaff'@'localhost';
+
 show grants for 'cphstaff'@'localhost';
-revoke select, index on AirportManagement.Airports from 'cphstaff'@'localhost';
-revoke select, index, update, delete on AirportManagement.Flights from 'cphstaff'@'localhost';
+
 
 -- Create virtual table (view) for flights related to CPH airport
+drop table if exists CPHFlight;
 create view CPHFlight as
     select * from Flight 
     where SourceCode = 'CPH' or DestinationCode = 'CPH';
@@ -38,7 +60,7 @@ select Class, Count(PassportID) as MemberNo
 select Count(PassportID) as NoVisitors from Passenger;
 
 -- Query count the number of passengers buying clothes
-select Count(Person) as ShopVisitors 
+select Count(PassportID) as ShopVisitors 
 	from Activity natural join Place
 		where Place.Service = 'Clothes';
 
