@@ -98,7 +98,7 @@ update Flight
 set DestinationCode = 'CPH'
 where SourceCode != 'CPH' and DestinationCode in ('HKG', 'FLN');
 
-select * from Flight;
+select * from CPHFlight;
 
 
 -- Upgrading economy-class passengers of flight GOL5021, which don't have a luggage to first class by updating the table
@@ -119,9 +119,20 @@ select * from Activity;
 
 
 -- Cancel all flights from Malokair for that day
-delete from flight where airline='malokair';
+delete from Flight where airline='malokair';
 
-select * from flight where airline='malokair';
+select * from Flight;
+
+
+-- Upgrading all passengers by  one class
+update Ticket set Class = 
+	case
+    when class = 'Gold' then class
+    when class = 'First class' then 'Gold'
+    when class = 'Member' then 'First class'
+    when class = 'Economy' then 'Member'
+    end;
+select * from ticket;
 
 
 -- Mark all luggage from Passenger '000000001' as delivered
