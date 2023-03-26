@@ -3,10 +3,9 @@
 drop user if exists 'cphstaff'@'localhost';
 create user 'cphstaff'@'localhost' identified by 'hygge4ever';
 
--- grant all on AirportManagement.* to 'cphstaff'@'localhost';
+-- grant all privileges on AirportManagement.* to 'cphstaff'@'localhost' with grant option;
+-- revoke all privileges on AirportManagement from 'cphstaff'@'localhost';
 -- show grants for 'cphstaff'@'localhost';
--- revoke select, index on AirportManagement.Airports from 'cphstaff'@'localhost';
--- revoke select, index, update, delete on AirportManagement.Flights from 'cphstaff'@'localhost';
 
 # Get all GRANT commands, copy (unquoted) and paste on the script.
 -- select concat("grant all on airportmanagement.", table_name, " to 'cphstaff'@'localhost';") 
@@ -64,7 +63,7 @@ select Count(PassportID) as ShopVisitors
 	from Activity natural join Place
 		where Place.Service = 'Clothes';
 
--- Query shows the relation 
+-- Query shows the relation between flights, tickets and luggage
 select * from Ticket natural join CPHFlight natural join Luggage;
 
 -- Query shows a table with FlightID, SourceCode, DestinationCode and sum of 
@@ -83,13 +82,50 @@ select Avg(S.TotalWeight) from
 
     
 -- Query shows the lost luggage (failed delivery to destination).
-select FirstName, LastName, Email, LuggageID
+select FirstName, LastName, PassportID, Email, LuggageID
 	from Passenger natural join Luggage natural join Flight natural join Ticket
     where Delivered = false and DepartureTime < current_time();
-    
----------------------------------------------------------
--- Updates and deletes (section 8 on table modifications)
----------------------------------------------------------
+
+# |-------------------------------->SQL Programming<-------------------------------|
+
+-- Function to determine if there's delayed luggage linked to a certain ticket
+delimiter //
+create function PendingLuggage(tkt char(13)) returns boolean
+begin
+return exists (select * from Luggage 
+		natural join Ticket natural join Flight
+		where TicketID = tkt and Delivered=false
+			and DepartureTime < current_time());
+end; //
+delimiter ;
+#drop function PendingLuggage;
+
+-- Result of function call on specific ticket ID
+select PendingLuggage('420OL1722640I');
+-- Result column of function applied to the entire Ticket table
+select TicketID, Class, PassportID, FlightID, 
+	PendingLuggage(TicketID) as Pending from Ticket;
+
+
+-- Procedure that allocates a free gate if available to a flight ID at given terminal
+delimiter //
+create procedure AllocateGate(IN flight char(7), IN terminal char(1))
+begin
+    if (select GateID from Gate where TerminalID = terminal and FlightID is null) is null
+    then signal SQLSTATE 'HY000'
+		set mysql_errno = 1525, message_text='All gates are currently in use';
+	else 
+		update Gate set FlightID = flight where TerminalID = terminal and FlightID is null limit 1;
+    end if;
+end;//
+delimiter ;
+
+#drop procedure AllocateGate;
+call AllocateGate('POT5311', '1');
+call AllocateGate('LOT2137', '2');
+select * from Gate;
+
+# |-------------------->Table Modifications (update/delete statements)<------------|
 
 set sql_safe_updates = 0;
 
@@ -139,7 +175,3 @@ select * from Flight;
 update luggage set delivered=true where PassportID = '000000001';
 
 select * from luggage;
-
-
-# |-------------------------------->SQL Programming<-------------------------------|
-

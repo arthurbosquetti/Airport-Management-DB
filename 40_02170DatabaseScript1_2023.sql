@@ -94,11 +94,11 @@ create table Gate(
 	AllocationStart Time,
 	AllocationEnd Time,
 	FloorLevel decimal(1,0),
-    Terminal char(1) not null,
+    TerminalID char(1) not null,
 	constraint id_format check (GateID regexp '^[A-Z][0-9][0-9]$'),
-	foreign key(Terminal) references Terminal(TerminalID) on delete cascade,
+	foreign key(TerminalID) references Terminal(TerminalID) on delete cascade,
     foreign key(FlightID) references Flight(FlightID) on delete set null,
-    primary key(GateID, Terminal)
+    primary key(GateID, TerminalID)
 	);
 
 # Ticket schema
@@ -240,10 +240,10 @@ insert into Flight values
 insert into Gate values
     # GateID, FlightID, AllocationStart, AllocationEnd, FloorLevel, TerminalID
     ( 'A10', "LAT2359", null, null, 0, '1' ),
-    ( 'A11', "MAX1234", null, null, 0, '1'),
+    ( 'A11', null, null, null, 0, '1'),
     ( 'A33', "SAS9921", null, null, 1, '1'),
     ( 'B01', "RYN5032", null, null, 0, '2'),
-    ( 'B02', "MAL6666", null, null, 1, '2'),
+    ( 'B02', null, null, null, 1, '2'),
     ( 'C33', "BAL5326", null, null, 0, '5');
 
 
@@ -290,7 +290,7 @@ insert into Luggage values
     ('98987773','17.40',false,'000000014','AUT5541903214'),
     ('16627123','4.20',false,'000000012','420OL1722640I'),
     ('16627124','4.20',false,'000000012','420OL1722640I'),
-    ('16627125','4.20',false,'000000012','420OL1722640I'),
+    ('16627125','4.20',true,'000000012','420OL1722640I'),
     ('16627126','4.20',false,'000000012','420OL1722640I'),
     ('87693432','16.60',false,'000000016','8274SW1277464'),
     ('45378284','14.10',false,'000000022','AUT2345623584');
