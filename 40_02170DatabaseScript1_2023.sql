@@ -28,7 +28,7 @@ create table Terminal(
 
 # Airports schema
 create table Airport
-	(AirportCode char(3),
+    (AirportCode char(3),
     constraint code_format check (AirportCode regexp '^[A-Z]\{3,3\}$'),
     AirportName varchar(50),
     Country varchar(40) not null,
@@ -134,7 +134,8 @@ insert into Terminal(TerminalID) values ('1'), ('2'), ('3'), ('4'), ('5');
 
 # Airport inserts
 insert into Airport values
-	('CPH', 'Copenhagen International Airport', 'Denmark', 'Copenhagen'),
+	  # AirportCode, AirportName, Country, City
+    ('CPH', 'Copenhagen International Airport', 'Denmark', 'Copenhagen'),
     ('FLN', 'Aeroporto International de Florianopolis', 'Brazil', 'Florianopolis'),
     ('AMS', 'Amsterdam Airport Schipol', 'Netherlands', 'Amsterdam'),
     ('FRA', 'Frankfurt Airport', 'Germany', 'Frankfurt'),
@@ -304,4 +305,4 @@ select * from Luggage;
 select * from Place;
 select * from Activity;
 select * from Terminal;
-select * from Luggage;
+select * from Gate;

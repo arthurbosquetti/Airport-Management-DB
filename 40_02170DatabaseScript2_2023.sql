@@ -133,7 +133,7 @@ begin
 	if new.ArrivalTime <= new.DepartureTime 
 	then signal sqlstate 'HY000'
 		set mysql_errno = 1580,
-        message_text = 'Arrival time should follow departure time';
+        message_text = 'Arrival time should be later than departure time';
 end if;
 if new.SourceCode = new.DestinationCode
 	then signal sqlstate 'HY000'
@@ -142,8 +142,6 @@ if new.SourceCode = new.DestinationCode
 end if;
 end //
 delimiter ;
-
-# -- Event for gate allocation approaching time:
 
 # |-------------------->Table Modifications (update/delete statements)<------------|
 
